@@ -2,6 +2,10 @@
 
 Welcome to the TryHackMe Windows Filter project! This project helps you fetch TryHackMe rooms and categorize them based on whether they have the "Windows" tag or not. The purpose is to help you find non-Windows rooms you haven't completed yet. 
 
+<p align="center">
+  <img src="./example.png">
+</p>
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
