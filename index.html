@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Non-Windows Rooms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .room {
+            background: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .room img {
+            max-width: 100px;
+            float: left;
+            margin-right: 15px;
+        }
+        .room h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .room p {
+            margin: 5px 0;
+        }
+        .tags {
+            margin-top: 10px;
+        }
+        .tag {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 5px;
+            border-radius: 3px;
+            margin-right: 5px;
+            font-size: 0.9em;
+        }
+        .link {
+            display: block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Non-Windows Rooms</h1>
+    <div id="rooms"></div>
+
+    <script>
+        // Fetch and display non-Windows rooms
+        fetch('non_windows_rooms.json')
+            .then(response => response.json())
+            .then(data => {
+                const roomsContainer = document.getElementById('rooms');
+                data.forEach(room => {
+                    const roomElement = document.createElement('div');
+                    roomElement.className = 'room';
+                    roomElement.innerHTML = `
+                        <img src="${room.imageURL}" alt="${room.title}">
+                        <h2>${room.title}</h2>
+                        <p>${room.description}</p>
+                        <div class="tags">${room.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+                        <a href="https://tryhackme.com/room/${room.code}" class="link" target="_blank">Go to Room</a>
+                    `;
+                    roomsContainer.appendChild(roomElement);
+                });
+            })
+            .catch(error => console.error('Error loading rooms:', error));
+    </script>
+
+</body>
+</html>
