@@ -3,7 +3,7 @@
 Welcome to the TryHackMe Windows Filter project! This project helps you fetch TryHackMe rooms and categorize them based on whether they have the "Windows" tag or not. The purpose is to help you find non-Windows rooms you haven't completed yet. 
 
 <p align="center">
-  <img src="./example.png">
+  <img src="./example2.png">
 </p>
 
 ## Table of Contents
@@ -43,15 +43,14 @@ This project contains:
     python tryhackme_windows_filter.py
     ```
 
-    This will generate two JSON files:
-    - `windows_rooms.json`: Rooms with the "Windows" tag.
-    - `non_windows_rooms.json`: Rooms without the "Windows" tag.
+    This will generate a JSON file:
+   - Inside this file will be the all the free rooms *(unless you adjusted the paramter in the python script) and your progress.
 
-2. Serve the HTML file to view the non-Windows rooms:
+3. Serve the HTML file to view the non-Windows rooms:
     ```sh
     sudo python -m http.server 80
     ```
-    Open your web browser and go to `http://localhost:8000/index.html` to view the non-Windows rooms.
+    Open your web browser and go to `http://localhost:80/index.html` to view the non-Windows rooms.
 
     Alternatively, you can directly open the `index.html` file in your web browser.
 
