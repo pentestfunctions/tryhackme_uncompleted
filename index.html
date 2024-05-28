@@ -3,78 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Non-Windows Rooms</title>
+    <title>TryHackMe Rooms</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        input[type="text"], select, input[type="checkbox"], button {
+            background-color: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-right: 20px;
+            outline: none;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        input[type="text"]::placeholder {
+            color: #bbb;
+        }
+        .filter-container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-container label {
+            margin-right: 10px;
+            font-size: 1em;
+        }
+        .filter-container select, .filter-container input[type="checkbox"] {
+            margin-bottom: 10px;
+        }
+        .tags-modal {
+            position: relative;
+            display: inline-block;
+        }
+        .tags-modal-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .tags-modal-content label {
+            display: block;
+            padding: 5px;
+            cursor: pointer;
+        }
+        .tags-modal-content label:hover {
+            background-color: #444;
+        }
+        .tags-modal input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .tags-modal .tags-modal-btn {
+            background-color: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+            font-size: 1em;
+        }
+        .tags-modal .tags-modal-btn:hover {
+            background-color: #444;
+        }
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
         .room {
-            background: white;
-            margin: 10px 0;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
             padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
         .room img {
             max-width: 100px;
-            float: left;
-            margin-right: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
         }
         .room h2 {
-            margin: 0;
-            font-size: 1.5em;
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.2em;
         }
         .room p {
-            margin: 5px 0;
+            text-align: center;
+            font-size: 0.9em;
+            margin-bottom: 10px;
         }
         .tags {
-            margin-top: 10px;
+            margin: 10px 0;
+            text-align: center;
         }
         .tag {
             display: inline-block;
-            background: #e0e0e0;
-            padding: 5px;
-            border-radius: 3px;
-            margin-right: 5px;
-            font-size: 0.9em;
+            background-color: #333;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 3px;
+            font-size: 12px;
         }
-        .link {
-            display: block;
-            margin-top: 10px;
-            text-decoration: none;
-            color: #007bff;
+        .progress {
+            width: 100%;
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            padding: 0 15px;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #555;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar-inner {
+            height: 100%;
+            background-color: #76c7c0;
+            text-align: center;
+            color: #000;
         }
     </style>
 </head>
 <body>
 
-    <h1>Non-Windows Rooms</h1>
-    <div id="rooms"></div>
+<header>
+    <h1>TryHackMe Rooms</h1>
+    <input type="text" id="searchBox" placeholder="Search rooms...">
+</header>
 
-    <script>
-        // Fetch and display non-Windows rooms
-        fetch('non_windows_rooms.json')
-            .then(response => response.json())
-            .then(data => {
-                const roomsContainer = document.getElementById('rooms');
-                data.forEach(room => {
-                    const roomElement = document.createElement('div');
-                    roomElement.className = 'room';
-                    roomElement.innerHTML = `
-                        <img src="${room.imageURL}" alt="${room.title}">
-                        <h2>${room.title}</h2>
-                        <p>${room.description}</p>
-                        <div class="tags">${room.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
-                        <a href="https://tryhackme.com/room/${room.code}" class="link" target="_blank">Go to Room</a>
-                    `;
-                    roomsContainer.appendChild(roomElement);
-                });
-            })
-            .catch(error => console.error('Error loading rooms:', error));
-    </script>
+<div class="filter-container">
+    <label for="difficultyFilter">Difficulty:</label>
+    <select id="difficultyFilter">
+        <option value="all">All</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+    </select>
+
+    <div class="tags-modal">
+        <button class="tags-modal-btn">Tags</button>
+        <div class="tags-modal-content" id="tagsModalContent">
+            <!-- Dynamically populated tags -->
+        </div>
+        <button id="clearTagsBtn">Clear Tags</button>
+    </div>
+
+    <label for="progressFilter">Sort by Progress:</label>
+    <select id="progressFilter">
+        <option value="none">None</option>
+        <option value="ascending">Ascending</option>
+        <option value="descending">Descending</option>
+    </select>
+
+    <label>
+        <input type="checkbox" id="hideCompleted"> Hide Completed Rooms
+    </label>
+</div>
+
+<div id="roomsContainer" class="rooms-grid">
+    <!-- Dynamically populated rooms -->
+</div>
+
+<script>
+    const roomsContainer = document.getElementById('roomsContainer');
+    const searchBox = document.getElementById('searchBox');
+    const difficultyFilter = document.getElementById('difficultyFilter');
+    const tagsModalContent = document.getElementById('tagsModalContent');
+    const progressFilter = document.getElementById('progressFilter');
+    const hideCompleted = document.getElementById('hideCompleted');
+    const tagsModalBtn = document.querySelector('.tags-modal-btn');
+    const clearTagsBtn = document.getElementById('clearTagsBtn');
+
+    let roomsData = [];
+    let selectedTags = new Set();
+
+    tagsModalBtn.addEventListener('click', () => {
+        tagsModalContent.style.display = tagsModalContent.style.display === 'block' ? 'none' : 'block';
+    });
+
+    clearTagsBtn.addEventListener('click', () => {
+        selectedTags.clear();
+        tagsModalContent.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        filterRooms();
+    });
+
+    async function fetchRoomsData() {
+        const response = await fetch('all_rooms_with_progress.json');
+        roomsData = await response.json();
+        populateTagsFilter();
+        filterRooms();
+    }
+
+    function populateTagsFilter() {
+        const tags = new Set();
+        roomsData.forEach(room => {
+            room.tags.forEach(tag => tags.add(tag));
+        });
+
+        tags.forEach(tag => {
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="checkbox" value="${tag}"> ${tag}`;
+            tagsModalContent.appendChild(label);
+        });
+
+        tagsModalContent.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    selectedTags.add(checkbox.value);
+                } else {
+                    selectedTags.delete(checkbox.value);
+                }
+                filterRooms();
+            });
+        });
+    }
+
+    function displayRooms(rooms) {
+        roomsContainer.innerHTML = '';
+        rooms.forEach(room => {
+            const roomDiv = document.createElement('div');
+            roomDiv.className = 'room';
+
+            const roomTags = room.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+            const progress = room.progress.progressPercentage;
+
+            roomDiv.innerHTML = `
+                <img src="${room.imageURL}" alt="${room.title}">
+                <h2>${room.title}</h2>
+                <p>${room.description}</p>
+                <div class="tags">${roomTags}</div>
+                <div class="progress">
+                    <div class="progress-bar">
+                        <div class="progress-bar-inner" style="width: ${progress}%">${progress}%</div>
+                    </div>
+                </div>
+            `;
+
+            roomsContainer.appendChild(roomDiv);
+        });
+    }
+
+    function filterRooms() {
+        const searchQuery = searchBox.value.toLowerCase();
+        const selectedDifficulty = difficultyFilter.value;
+        const selectedProgressSort = progressFilter.value;
+        const hideCompletedRooms = hideCompleted.checked;
+
+        let filteredRooms = roomsData.filter(room => {
+            const matchesSearch = room.title.toLowerCase().includes(searchQuery);
+            const matchesDifficulty = selectedDifficulty === 'all' || room.difficulty === selectedDifficulty;
+            const matchesTags = selectedTags.size === 0 || Array.from(selectedTags).every(tag => room.tags.includes(tag));
+            const matchesProgress = !hideCompletedRooms || room.progress.progressPercentage < 100;
+            return matchesSearch && matchesDifficulty && matchesTags && matchesProgress;
+        });
+
+        if (selectedProgressSort === 'ascending') {
+            filteredRooms.sort((a, b) => a.progress.progressPercentage - b.progress.progressPercentage);
+        } else if (selectedProgressSort === 'descending') {
+            filteredRooms.sort((a, b) => b.progress.progressPercentage - a.progress.progressPercentage);
+        }
+
+        displayRooms(filteredRooms);
+    }
+
+    searchBox.addEventListener('input', filterRooms);
+    difficultyFilter.addEventListener('change', filterRooms);
+    progressFilter.addEventListener('change', filterRooms);
+    hideCompleted.addEventListener('change', filterRooms);
+
+    window.addEventListener('click', event => {
+        if (!event.target.matches('.tags-modal-btn')) {
+            tagsModalContent.style.display = 'none';
+        }
+    });
+
+    fetchRoomsData();
+</script>
 
 </body>
 </html>
