@@ -25,7 +25,7 @@ def fetch_rooms(cookie):
         "connect.sid": cookie,
     }
 
-    # Iterate through pages 1 to 10
+    # Iterate through pages 1 to 20
     for page in range(1, 21):
         params["page"] = page
         response = requests.get(base_url, headers=headers, cookies=cookies, params=params)
@@ -39,29 +39,57 @@ def fetch_rooms(cookie):
     
     return all_rooms
 
-# Function to categorize rooms based on the presence of the "Windows" tag
-def categorize_rooms(rooms):
-    windows_rooms = []
-    non_windows_rooms = []
+# Function to fetch progress data for the given room codes
+def fetch_progress_data(room_codes, cookie):
+    room_codes_str = "%2C".join(room_codes)
+    url = f"https://tryhackme.com/api/v2/hacktivities/search-progress?roomCodes={room_codes_str}"
+    headers = {
+        "accept": "*/*",
+        "accept-language": "en-US,en;q=0.5",
+        "priority": "u=1, i",
+    }
+    cookies = {
+        "connect.sid": cookie,
+    }
 
-    for room in rooms:
-        if any(tag['label'].lower() == 'windows' for tag in room['tagDocs']):
-            windows_rooms.append(room)
-        else:
-            non_windows_rooms.append(room)
-
-    return windows_rooms, non_windows_rooms
+    response = requests.get(url, headers=headers, cookies=cookies)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Failed to fetch progress data: {response.status_code}")
+        return {}
 
 # Main script execution
 rooms = fetch_rooms(cookie)
-windows_rooms, non_windows_rooms = categorize_rooms(rooms)
 
-# Save the categorized room lists to JSON files
-with open('windows_rooms.json', 'w') as f:
-    json.dump(windows_rooms, f, indent=4)
+# Extract room codes
+room_codes = [room['code'] for room in rooms]
 
-with open('non_windows_rooms.json', 'w') as f:
-    json.dump(non_windows_rooms, f, indent=4)
+# Fetch progress data for the rooms
+progress_data = fetch_progress_data(room_codes, cookie)
 
-print(f"Rooms with Windows tag: {len(windows_rooms)}")
-print(f"Rooms without Windows tag: {len(non_windows_rooms)}")
+if 'data' in progress_data and 'roomProgress' in progress_data['data']:
+    progress_data = progress_data['data']['roomProgress']
+else:
+    progress_data = []
+
+# Create a dictionary of progress data for quick lookup
+progress_dict = {item['roomCode']: item for item in progress_data}
+
+# Add progress data to the rooms
+for room in rooms:
+    room_code = room['code']
+    if room_code in progress_dict:
+        room['progress'] = progress_dict[room_code]
+    else:
+        room['progress'] = {
+            'progressPercentage': 0,
+            'completedAt': None,
+            'lastActivityAt': None
+        }
+
+# Save the room list with progress data to a JSON file
+with open('all_rooms_with_progress.json', 'w') as f:
+    json.dump(rooms, f, indent=4)
+
+print(f"Total rooms fetched: {len(rooms)}")
